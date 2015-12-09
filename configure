@@ -193,8 +193,8 @@ configure_packages ()
 			sct="./autogen.sh $enable_tests $enable_x64"
 		elif test -a $path/configure; then
 			sct=./configure
-		elif test -a $path/configure.sh; then
-			sct=./configure.sh
+        elif test -a $path/configure.sh; then
+            sct=./configure.sh
 		else
 			echo Configuration script not found in directory: $p
 			exit 1
