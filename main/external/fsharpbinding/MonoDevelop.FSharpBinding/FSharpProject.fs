@@ -59,6 +59,8 @@ type FSharpProject() as self =
         |> Seq.tryFind (fun i -> i.UnevaluatedValue.Equals(".NETPortable"))
         |> Option.isSome
 
+    
+
     [<ProjectPathItemProperty ("TargetProfile", DefaultValue = "mscorlib")>]
     member val TargetProfile = "mscorlib" with get, set
 
@@ -68,9 +70,20 @@ type FSharpProject() as self =
     override x.OnInitialize() =
         base.OnInitialize()
 
+
     override x.OnReadProject(progress, project) =
         initialisedAsPortable <- isPortable project
         base.OnReadProject(progress, project)
+
+        LoggingService.logDebug "%A" x.References
+        let isAndroid = CompilerArguments.Project.isAndroid x.References
+        if isAndroid && not (File.Exists (CompilerArguments.Project.androidResourcePath x)) then
+            let objFolder = Path.Combine(x.FileName.ParentDirectory.ToString(), "obj", "Debug")
+            if not (Directory.Exists objFolder) then
+                Directory.CreateDirectory objFolder |> ignore
+            let watcher = new FileSystemWatcher(Path = objFolder, Filter = CompilerArguments.Project.androidResourceFileName)
+            watcher.Created.Add(fun _ -> LoggingService.logInfo "%s detected at %s" CompilerArguments.Project.androidResourceFileName objFolder; invalidateProjectFile())
+            watcher.EnableRaisingEvents <- true
 
     override x.OnReadProjectHeader(progress, project) =
         initialisedAsPortable <- isPortable project
@@ -167,6 +180,7 @@ type FSharpProject() as self =
 
     override x.OnReferenceAddedToProject(e) =
         base.OnReferenceAddedToProject(e)
+        LoggingService.logInfo "Reference added %s, Loading %b" e.ProjectReference.Include self.Loading
         if not self.Loading then invalidateProjectFile()
 
     override x.OnReferenceRemovedFromProject(e) =

@@ -41,6 +41,17 @@ module CompilerArguments =
       else FSharpTargetFramework.NET_4_5
 
   module Project =
+      let (/) a b = Path.Combine (a, b)
+
+      let androidResourceFileName = "Resource.Designer.dll"
+      let androidResourceDll = "obj" / "Debug" / androidResourceFileName
+
+      let androidResourcePath (project:DotNetProject) =
+          project.FileName.ParentDirectory.ToString() / androidResourceDll
+
+      let isAndroid (refs: ProjectReferenceCollection) =
+          refs |> Seq.exists(fun r -> r.Include = "Mono.Android")
+
       ///Use the IdeApp.Workspace active configuration failing back to proj.DefaultConfiguration then ConfigurationSelector.Default
       let getCurrentConfigurationOrDefault (proj:Project) =
           match IdeApp.Workspace with
@@ -174,6 +185,9 @@ module CompilerArguments =
                                                Some (resolved.MainModule.FullyQualifiedName))
 
   let resolutionFailedMessage (n:string) = String.Format ("Resolution: Assembly resolution failed when trying to find default reference for: {0}", n)
+
+
+
   /// Generates references for the current project & configuration as a
   /// list of strings of the form [ "-r:<full-path>"; ... ]
   let generateReferences (project: DotNetProject, langVersion, targetFramework, configSelector, shouldWrap) =
@@ -290,6 +304,10 @@ module CompilerArguments =
             | Some ref -> yield "-r:" + wrapf(ref)
             | None -> LoggingService.LogWarning(resolutionFailedMessage "mscorlib")
         | _ -> () // found them both, no action needed
+
+        if Project.isAndroid project.References then
+            if File.Exists (Project.androidResourcePath(project)) then
+                yield "-r:" + Project.androidResourceDll
 
         for file in projectReferences do
             yield "-r:" + wrapf(file) ]
