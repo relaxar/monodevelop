@@ -20,6 +20,7 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("MonoDevelop.Refactoring")]
 [assembly: InternalsVisibleTo("MonoDevelop.CSharpBinding")]
 [assembly: InternalsVisibleTo("FSharpBinding")]
+[assembly: InternalsVisibleTo("MonoDevelop.FSharp.Tests")]
 [assembly: InternalsVisibleTo("MonoDevelop.Xml")]
 [assembly: InternalsVisibleTo("MonoDevelop.AspNet")]
 [assembly: InternalsVisibleTo("Xamarin.Ide")]

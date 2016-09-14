@@ -14,7 +14,7 @@ module FixtureSetup =
         if !firstRun then
             firstRun := false
             Environment.SetEnvironmentVariable ("MONO_ADDINS_REGISTRY", "/tmp")
-            Environment.SetEnvironmentVariable ("XDG_CONFIG_HOME", "/tmp")
+            //Environment.SetEnvironmentVariable ("XDG_CONFIG_HOME", "/tmp")
             MonoDevelop.FSharp.MDLanguageService.DisableVirtualFileSystem()
             Runtime.Initialize (true)
             MonoDevelop.Ide.DesktopService.Initialize()

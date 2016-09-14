@@ -113,6 +113,9 @@
     <Reference Include="Xamarin.Mac">
       <HintPath>..\..\..\build\bin\Xamarin.Mac.dll</HintPath>
     </Reference>
+    <Reference Include="FSharp.Core">
+      <HintPath>..\packages\FSharp.Core\lib\net40\FSharp.Core.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="TestBase.fs" />
@@ -132,6 +135,7 @@
     <Compile Include="GlobalSearch.fs" />
     <Compile Include="ParsingTests.fs" />
     <Compile Include="CompletionTests.fs" />
+    <Compile Include="ProjectTemplates.fs" />
   </ItemGroup>
   <PropertyGroup>
     <FSharpTargetsPath>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\FSharp\Microsoft.FSharp.Targets</FSharpTargetsPath>
@@ -141,10 +145,6 @@
   </PropertyGroup>
   <Import Project="$(FSharpTargetsPath)" Condition="Exists('$(FSharpTargetsPath)')" />
   <ItemGroup>
-    <ProjectReference Include="..\MonoDevelop.FSharpBinding\MonoDevelop.FSharp.fsproj">
-      <Project>{4C10F8F9-3816-4647-BA6E-85F5DE39883A}</Project>
-      <Name>MonoDevelop.FSharp</Name>
-    </ProjectReference>
     <ProjectReference Include="..\MonoDevelop.FSharpi.Service\MonoDevelop.FSharpInteractive.Service.fsproj">
       <Project>{20D6EC2C-B62E-49D1-B685-90D8967A5B5D}</Project>
       <Name>MonoDevelop.FSharpInteractive.Service</Name>
@@ -152,6 +152,10 @@
     <ProjectReference Include="..\MonoDevelop.FSharp.Shared\MonoDevelop.FSharp.Shared.fsproj">
       <Project>{AF5FEAD5-B50E-4F07-A274-32F23D5C504D}</Project>
       <Name>MonoDevelop.FSharp.Shared</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MonoDevelop.FSharpBinding\MonoDevelop.FSharp.fsproj">
+      <Project>{4C10F8F9-3816-4647-BA6E-85F5DE39883A}</Project>
+      <Name>MonoDevelop.FSharp</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -176,13 +180,14 @@
     <None Include="Samples\android\fsandroidnuget2\MainActivity.fs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="..\.paket\paket.targets" />
   <ProjectExtensions>
     <MonoDevelop>
       <Properties>
         <Policies>
-          <TextStylePolicy inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/x-fsharp" />
+          <TextStylePolicy FileWidth="80" TabWidth="4" TabsToSpaces="True" IndentWidth="4" RemoveTrailingWhitespace="True" NoTabsAfterNonTabs="False" EolMarker="Native" inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/x-fsharp" />
           <FSharpFormattingPolicy scope="text/x-fsharp">
             <DefaultFormat IndentOnTryWith="False" ReorderOpenDeclaration="False" SpaceAfterComma="True" SpaceAfterSemicolon="True" SpaceAroundDelimiter="True" SpaceBeforeArgument="True" SpaceBeforeColon="True" />
           </FSharpFormattingPolicy>
@@ -253,11 +258,6 @@
     </When>
     <When Condition="($(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.0' Or $(TargetFrameworkVersion) == 'v4.5' Or $(TargetFrameworkVersion) == 'v4.5.1' Or $(TargetFrameworkVersion) == 'v4.5.2' Or $(TargetFrameworkVersion) == 'v4.5.3' Or $(TargetFrameworkVersion) == 'v4.6')) Or ($(TargetFrameworkIdentifier) == 'MonoAndroid') Or ($(TargetFrameworkIdentifier) == 'MonoTouch')">
       <ItemGroup>
-        <Reference Include="FSharp.Core">
-          <HintPath>..\packages\FSharp.Core\lib\net40\FSharp.Core.dll</HintPath>
-          <Private>True</Private>
-          <Paket>True</Paket>
-        </Reference>
       </ItemGroup>
     </When>
     <When Condition="($(TargetFrameworkIdentifier) == 'Silverlight' And $(TargetFrameworkVersion) == 'v5.0') Or ($(TargetFrameworkProfile) == 'Profile24') Or ($(TargetFrameworkProfile) == 'Profile47')">
@@ -352,4 +352,5 @@
       </ItemGroup>
     </When>
   </Choose>
+  <Import Project="..\packages\Xamarin.Forms.2.3.1.114\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets" Condition="Exists('..\packages\Xamarin.Forms.2.3.1.114\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets')" />
 </Project>
