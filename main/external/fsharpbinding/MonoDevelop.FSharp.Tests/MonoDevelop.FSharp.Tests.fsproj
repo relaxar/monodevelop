@@ -145,10 +145,6 @@
   </PropertyGroup>
   <Import Project="$(FSharpTargetsPath)" Condition="Exists('$(FSharpTargetsPath)')" />
   <ItemGroup>
-    <ProjectReference Include="..\MonoDevelop.FSharpi.Service\MonoDevelop.FSharpInteractive.Service.fsproj">
-      <Project>{20D6EC2C-B62E-49D1-B685-90D8967A5B5D}</Project>
-      <Name>MonoDevelop.FSharpInteractive.Service</Name>
-    </ProjectReference>
     <ProjectReference Include="..\MonoDevelop.FSharp.Shared\MonoDevelop.FSharp.Shared.fsproj">
       <Project>{AF5FEAD5-B50E-4F07-A274-32F23D5C504D}</Project>
       <Name>MonoDevelop.FSharp.Shared</Name>
