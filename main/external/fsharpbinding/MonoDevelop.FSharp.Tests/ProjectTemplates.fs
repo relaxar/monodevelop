@@ -59,7 +59,7 @@ type ``Template tests``() =
     let profileMap =
         Map.ofList [".NETPortable", "portable-net45+netcore45+wp8"
                     ".NETFramework", "net40"
-                    "MonoAndroid", "portable-net45+netcore45+wp8"
+                    "MonoAndroid", "MonoAndroid10"
                     "Xamarin.iOS", "Xamarin.iOS10"]
 
     member x.Templates =
@@ -118,18 +118,27 @@ type ``Template tests``() =
             let projects = sln.Items |> Seq.filter(fun i -> i :? DotNetProject) |> Seq.cast<DotNetProject> |> List.ofSeq
 
             let fixReferences (project:DotNetProject) =
-                let assemblyReferencesForPackage (package: ProjectTemplatePackageReference) =
-                    let profile = profileMap.[project.TargetFramework.Id.Identifier]
-                    let nameAndVersion = sprintf "%s.%s" package.Id package.Version
-                    let foldersToScan = [packagesFolder/nameAndVersion/"lib"/profile
-                                         packagesFolder/nameAndVersion/"lib"/"portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10" //XF
-                                         packagesFolder/nameAndVersion/"lib"]
+                let rec assemblyReferencesForPackage (packageId, packageVersion) =
+                    seq {
+                        let profile = profileMap.[project.TargetFramework.Id.Identifier]
+                        let nameAndVersion = sprintf "%s.%s" packageId packageVersion
+                        let foldersToScan = [packagesFolder/nameAndVersion/"lib"/profile
+                                             packagesFolder/nameAndVersion/"lib"/"portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10" //XF
+                                             packagesFolder/nameAndVersion/"lib"]
 
-                    let baseFolder = foldersToScan |> List.find Directory.Exists
+                        let baseFolder = foldersToScan |> List.find Directory.Exists
 
-                    let files = Directory.GetFiles(baseFolder, "*.dll", SearchOption.AllDirectories)
-                    files
-                    |> Array.map(fun file -> ProjectReference.CreateCustomReference(ReferenceType.Assembly, package.Id, file))
+                        let files = Directory.GetFiles(baseFolder, "*.dll", SearchOption.AllDirectories)
+                        yield! files
+                               |> Seq.map(fun file -> ProjectReference.CreateCustomReference(ReferenceType.Assembly, packageId, file))
+
+                        // hack to get dependent packages for XF. Should really unzip the nupkgs and inspect the nuspecs for deps
+                        if packageId = "Xamarin.Android.Support.v7.AppCompat" then
+                            yield! assemblyReferencesForPackage ("Xamarin.Android.Support.v4", "23.3.0")
+                            yield! assemblyReferencesForPackage ("Xamarin.Android.Support.Vector.Drawable", "23.3.0")
+                            yield! assemblyReferencesForPackage ("Xamarin.Android.Support.Animated.Vector.Drawable", "23.3.0")
+                            yield! assemblyReferencesForPackage ("Xamarin.Android.Support.v7.CardView", "23.3.0")
+                    }
 
                 let packages = 
                     projectTemplate.PackageReferencesForCreatedProjects
@@ -139,6 +148,7 @@ type ``Template tests``() =
                 let addRefs (packageReferences:PackageReferencesForCreatedProject) =
                     let refs =
                         packageReferences.PackageReferences
+                        |> Seq.map (fun p -> p.Id, p.Version)
                         |> Seq.collect assemblyReferencesForPackage
 
                     for ref in refs do
